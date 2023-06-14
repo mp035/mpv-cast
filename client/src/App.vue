@@ -123,7 +123,7 @@ const onControlButtonClicked = async (button: Button) => {
 const onUpDirectoryClicked = async () => {
   const path = currentDirectory.value.split("/");
   path.pop();
-  const newPath = path.join("/");
+  const newPath = path.join("/") || "/";
   const response = await listDirectory(newPath);
   directoryListing.value = response.data.listing;
   currentDirectory.value = response.data.directory;
@@ -183,8 +183,8 @@ async function updateProperties(oneTime: boolean = false) {
   pauseButtonColor.value = (await getPauseStatus()) ? "secondary" : "primary";
   muteButtonColor.value = (await mpvRequest("get_property", "mute")).data.data ? "secondary" : "primary";
   subtitleButtonColor.value = (await getSubtitleStatus()) ? "secondary" : "primary";
-  
   volumeLevel.value = (await mpvRequest("get_property", "volume")).data.data;
+
   if (! oneTime) {
     setTimeout(updateProperties, 5000);
   }

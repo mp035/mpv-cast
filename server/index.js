@@ -1,7 +1,4 @@
 
-const host = "0.0.0.0";
-const port = 3000;
-
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
@@ -10,19 +7,24 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import send from 'koa-send';
 import serveStatic from 'koa-static';
+import MpvClient from './mpv-client.js';
+import getLocalIp from './get-local-ip.js';
+import { PrettyConsole } from './pretty-console.js';
 
-import { mpvRequest, shutdownMpv } from './mpv-client.js';
+const host = process.env.HTTP_HOST || "0.0.0.0";
+const port = process.env.HTTP_PORT || 3000;
+const MEDIA_ROOT =  process.env.MEDIA_ROOT || process.env.HOME;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//const MEDIA_ROOT = "/home/mark/Downloads";
-const MEDIA_ROOT = "/media/dlna/Public/Shared Videos";
 let currentDirectory = MEDIA_ROOT;
+const mpvClient = new MpvClient();
+const prettyConsole = new PrettyConsole()
 
 process.on("SIGINT", async () => {
-  console.log("SIGINT received, shutting down...");
-  await shutdownMpv();
+  prettyConsole.log("SIGINT received, shutting down...");
+  await mpvClient.shutdownMpv();
   process.exit(0);
 });
 
@@ -74,8 +76,26 @@ app.use(async ctx => {
     currentDirectory = directoryToList;
 
   } else {
-    ctx.body = { data:await mpvRequest(ctx.request.body) };
+    ctx.body = { data:await mpvClient.mpvRequest(ctx.request.body) };
   }
 });
 
 app.listen(port, host);
+
+
+//prettyConsole.info(`Server running at http://${host}:${port}/`);
+
+const ipMessages = [];
+const addresses = getLocalIp();
+for (const name of Object.keys(addresses)) {
+  for (const address of addresses[name]) {
+    ipMessages.push(`\u25ce http://${address}:${port}`);
+  }
+}
+if (ipMessages.length){
+  
+  prettyConsole.success("Found some local ip addresses. You can try the following in a browser on your network:");
+  prettyConsole.print('black', 'cyan', ...ipMessages);
+} else {
+  prettyConsole.warn("Could not find any local IP addresses, you will have to manually get the ip address of this machine.");
+}

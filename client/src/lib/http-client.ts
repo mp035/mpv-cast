@@ -1,5 +1,4 @@
-//const SERVERURL = 'http://localhost:3000';
-const SERVERURL = 'http://goldfish.lan:3000';
+const SERVERURL = 'http://localhost:3000';
 //const SERVERURL = '/';
 
 // perform an http request using fetch api with json body and return json response
