@@ -1,5 +1,5 @@
-const SERVERURL = 'http://localhost:3000';
-//const SERVERURL = '/';
+//const SERVERURL = 'http://localhost:3000';
+const SERVERURL = '/';
 
 // perform an http request using fetch api with json body and return json response
 export const httpRequest = async (url: string, method: string, body?: any) => {
