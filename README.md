@@ -24,8 +24,13 @@ or
 ### (Optional) set node 18 as default so you don't have to run "`nvm use lts/hydrogen`" everytime
     nvm alias default lts/hydrogen
 
+### Install client packages and build the client
+    cd mpv-cast/client
+    npm install
+    npm run build
+
 ### Install required npm packages and start the server
-    cd mpv-cast/server
+    cd ../server
     npm install
     node index.js
 
