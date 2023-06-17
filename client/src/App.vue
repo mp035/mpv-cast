@@ -177,16 +177,29 @@ const getSubtitleStatus = async () => {
   }
 }
 
+let pollTimeout:number|null = null
+
+document.addEventListener('visibilitychange', ()=>{
+  if (document.hidden && pollTimeout !== null) {
+    clearTimeout(pollTimeout);
+    pollTimeout = null;
+  } else if (! document.hidden && pollTimeout === null) {
+    updateProperties();
+  }
+}, false);
+
 async function updateProperties(oneTime: boolean = false) {
-  percentPos.value = await getPercentPos();
-  currentFile.value = await getCurrentFile();
-  pauseButtonColor.value = (await getPauseStatus()) ? "secondary" : "primary";
-  muteButtonColor.value = (await mpvRequest("get_property", "mute")).data.data ? "secondary" : "primary";
-  subtitleButtonColor.value = (await getSubtitleStatus()) ? "secondary" : "primary";
-  volumeLevel.value = (await mpvRequest("get_property", "volume")).data.data;
+  if (! document.hidden){
+    percentPos.value = await getPercentPos();
+    currentFile.value = await getCurrentFile();
+    pauseButtonColor.value = (await getPauseStatus()) ? "secondary" : "primary";
+    muteButtonColor.value = (await mpvRequest("get_property", "mute")).data.data ? "secondary" : "primary";
+    subtitleButtonColor.value = (await getSubtitleStatus()) ? "secondary" : "primary";
+    volumeLevel.value = (await mpvRequest("get_property", "volume")).data.data;
+  }
 
   if (! oneTime) {
-    setTimeout(updateProperties, 5000);
+    pollTimeout = setTimeout(updateProperties, document.hidden ? 15000 : 5000);
   }
 }
 
