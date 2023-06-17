@@ -10,6 +10,9 @@ import serveStatic from 'koa-static';
 import MpvClient from './mpv-client.js';
 import getLocalIp from './get-local-ip.js';
 import { PrettyConsole } from './pretty-console.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const host = process.env.HTTP_HOST || "0.0.0.0";
 const port = process.env.HTTP_PORT || 3000;
